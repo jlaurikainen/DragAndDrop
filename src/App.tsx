@@ -37,17 +37,6 @@ const App = () => {
 
   return (
     <div>
-      <button
-        onClick={() =>
-          setItems(
-            items
-              .sort((a, b) => a.number - b.number)
-              .map((b, i) => ({ ...b, order: i }))
-          )
-        }
-      >
-        Autosort by number
-      </button>
       {items.map((item, index) => (
         <Item
           draggable={true}
