@@ -9,7 +9,7 @@ interface IItem {
   order: number;
 }
 
-const items: IItem[] = new Array(6).fill(null).map((_, i) => ({
+const initialItems: IItem[] = new Array(6).fill(null).map((_, i) => ({
   id: `item${i}`,
   number: Math.floor(Math.random() * 10000 + Math.random() * 100 * i),
   name: `${faker.finance.accountName()} ${faker.lorem.words(2)}`,
@@ -17,61 +17,30 @@ const items: IItem[] = new Array(6).fill(null).map((_, i) => ({
 }));
 
 const App = () => {
-  const [dragId, setDragId] = useState<string | null>(null);
-  const [boxes, setBoxes] = useState<IItem[]>(items);
+  const [items, setItems] = useState<IItem[]>(initialItems);
+  const [dragItem, setDragItem] = useState<number>();
 
-  const handleDrag = (e: React.DragEvent) => {
-    setDragId(e.currentTarget.id);
+  const handleDragStart = (index: number) => {
+    setDragItem(index);
   };
 
-  const handleDrop = (e: React.DragEvent) => {
-    const dragItem = boxes.find((b) => b.id === dragId);
-    const dropTarget = boxes.find((b) => b.id === e.currentTarget.id);
+  const handleDragEnter = (_: React.DragEvent, index: number) => {
+    const newList = [...items];
+    const item = newList[dragItem!];
 
-    const dragIndex = dragItem!.order;
-    const dropIndex = dropTarget!.order;
+    newList.splice(dragItem!, 1);
+    newList.splice(index, 0, item);
 
-    /** Do nothing if drop target is drag target */
-    if (dragIndex === dropIndex) return;
-
-    /** We are dragging from top to bottom */
-    if (dragIndex < dropIndex) {
-      const smallerAndNoDrag = boxes.filter(
-        (b) => b.order <= dropIndex && b.order !== dragIndex
-      );
-      const rest = boxes.filter((b) => b.order > dropIndex);
-
-      const newBoxes = [...smallerAndNoDrag, dragItem!, ...rest].map(
-        (b, i) => ({ ...b, order: i })
-      );
-
-      setBoxes(newBoxes);
-      setDragId(null);
-      return;
-    }
-
-    /** We are dragging from bottom to top */
-    const smallerAndNoDrag = boxes.filter((b) => b.order < dropIndex);
-
-    const rest = boxes.filter(
-      (b) => b.order >= dropIndex && b.order !== dragIndex
-    );
-
-    const newBoxes = [...smallerAndNoDrag, dragItem!, ...rest].map((b, i) => ({
-      ...b,
-      order: i,
-    }));
-
-    setBoxes(newBoxes);
-    setDragId(null);
+    setDragItem(index);
+    setItems(newList);
   };
 
   return (
     <div>
       <button
         onClick={() =>
-          setBoxes(
-            boxes
+          setItems(
+            items
               .sort((a, b) => a.number - b.number)
               .map((b, i) => ({ ...b, order: i }))
           )
@@ -79,13 +48,13 @@ const App = () => {
       >
         Autosort by number
       </button>
-      {boxes.map((item) => (
+      {items.map((item, index) => (
         <Item
           draggable={true}
           id={item.id}
-          onDragStart={handleDrag}
+          onDragStart={() => handleDragStart(index)}
+          onDragEnter={(e) => handleDragEnter(e, index)}
           onDragOver={(e) => e.preventDefault()}
-          onDrop={handleDrop}
           key={item.order}
         >
           <Handle tabIndex={-1} title="Sort by dragging" />
