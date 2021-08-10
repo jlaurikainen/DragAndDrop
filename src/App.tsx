@@ -1,128 +1,173 @@
-import * as faker from "faker";
-import React, { useState } from "react";
-import styled, { css } from "styled-components";
+import React, { useEffect, useState } from "react";
+import Select from "./components/select/Select";
 
-interface IItem {
-  id: string;
-  number: number;
+interface User {
+  id: number;
   name: string;
-  order: number;
+  username: string;
+  email: string;
+  address: {
+    street: string;
+    suite: string;
+    city: string;
+    zipcode: string;
+    geo: {
+      lat: number;
+      lng: number;
+    };
+  };
+  phone: string;
+  website: string;
+  company: {
+    name: string;
+    catchPhrase: string;
+    bs: string;
+  };
 }
 
-const initialItems: IItem[] = new Array(6).fill(null).map((_, i) => ({
-  id: `item${i}`,
-  number: Math.floor(Math.random() * 10000 + Math.random() * 100 * i),
-  name: `${faker.finance.accountName()} ${faker.lorem.words(2)}`,
-  order: i,
-}));
-
 const App = () => {
-  const [items, setItems] = useState<IItem[]>(initialItems);
-  const [dragItem, setDragItem] = useState<number>();
+  const [value, setValue] = useState<readonly User[]>([]);
+  const [options, setOptions] = useState<User[]>([]);
 
-  const handleDragStart = (index: number) => {
-    setDragItem(index);
-  };
-
-  const handleDragEnter = (_: React.DragEvent, index: number) => {
-    const newList = [...items];
-    const item = newList[dragItem!];
-
-    newList.splice(dragItem!, 1);
-    newList.splice(index, 0, item);
-
-    setDragItem(index);
-    setItems(newList);
-  };
+  useEffect(() => {
+    const getOptions = async () => {
+      const res = await fetch("https://jsonplaceholder.typicode.com/users");
+      const data = await res.json();
+      setOptions(data);
+    };
+    getOptions();
+  }, []);
 
   return (
-    <div>
-      {items.map((item, index) => (
-        <Item
-          draggable={true}
-          id={item.id}
-          onDragStart={() => handleDragStart(index)}
-          onDragEnter={(e) => handleDragEnter(e, index)}
-          onDragOver={(e) => e.preventDefault()}
-          key={item.order}
-        >
-          <Handle tabIndex={-1} title="Sort by dragging" />
-          <Number>{item.number}</Number>
-          <Name>{item.name}</Name>
-          <Button title="Remove from list" />
-        </Item>
-      ))}
-    </div>
+    <>
+      <Select<User, true>
+        onChange={(v) => setValue(v)}
+        options={options}
+        isMulti
+        hideSelectedOptions={false}
+        closeMenuOnSelect={false}
+        value={value}
+        getOptionLabel={(o) => o.name}
+        getOptionValue={(o) => `${o.id}`}
+      />
+    </>
   );
 };
 
 export default App;
 
-const Item = styled.div`
-  display: grid;
-  flex: 1 1 100%;
-  grid-template-columns: min-content 6ch auto min-content;
-  padding: 8px;
-  gap: 16px;
-  align-items: center;
-  box-shadow: 0 3px 5px 1px rgba(0, 0, 0, 0.15);
-  background-color: white;
+// type IMenu = { label: string; menuItems?: IMenuItem[] }[];
 
-  & + & {
-    margin-top: 8px;
-  }
+// interface IMenuItem {
+//   label: string;
+//   subItems?: Omit<IMenuItem, "subItems">[];
+// }
 
-  &[draggable] {
-    opacity: 1;
-  }
-`;
+// const testItems: IMenu = [
+//   {
+//     label: "Menu 1",
+//     menuItems: [
+//       {
+//         label: "Item 1",
+//       },
+//       {
+//         label: "Item 1",
+//         subItems: [
+//           { label: "Subitem 1" },
+//           { label: "Subitem 2" },
+//           { label: "Subitem 3" },
+//         ],
+//       },
+//       {
+//         label: "Item 1",
+//       },
+//     ],
+//   },
+//   { label: "Menu middle" },
+//   { label: "Menu 2", menuItems: [{ label: "Item 1" }, { label: "Item 2" }] },
+// ];
 
-const baseStyles = css`
-  display: flex;
-  align-items: center;
-  font-family: sans-serif;
-  font-size: 16px;
-  line-height: 1;
-`;
+// const Menu = ({ menu }: { menu: IMenu }) => {
+//   const [activeMenuItem, setActiveMenuItem] = useState(-1);
 
-const Handle = styled.button`
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 0 24 24' width='24px' fill='%23999999'%3E%3Cpath d='M0 0h24v24H0V0z' fill='none'/%3E%3Cpath d='M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z'/%3E%3C/svg%3E");
-  background-position: center center;
-  background-repeat: no-repeat;
-  border: 0;
-  background-color: transparent;
-  width: 48px;
-  height: 100%;
-  cursor: ns-resize;
-`;
+//   const handleMenuItem = (id: number) => {
+//     setActiveMenuItem(id);
+//   };
 
-const Number = styled.div`
-  grid-area: 1 / 2 / 2 / 3;
-  font-weight: bold;
-  ${baseStyles}
-  margin: 0;
-`;
+//   const mapMenu = () => {
+//     let itemIndex = 0;
 
-const Name = styled.div`
-  grid-area: 1 / 3 / 2 / 4;
-  font-weight: normal;
-  ${baseStyles}
-  margin: 0;
-  padding: 16px 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
+//     return menu.map((top) => ({
+//       ...top,
+//       menuId: itemIndex++,
+//       menuItems: top.menuItems?.map((items) => ({
+//         ...items,
+//         menuId: itemIndex++,
+//         subItems: items.subItems?.map((sub) => {
+//           return { ...sub, menuId: itemIndex++ };
+//         }),
+//       })),
+//     }));
+//   };
 
-const Button = styled.button`
-  cursor: pointer;
-  grid-area: 1 / 4 / 2 / 5;
-  border: 0;
-  background-color: transparent;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 0 24 24' width='24px' fill='%23000000'%3E%3Cpath d='M0 0h24v24H0V0z' fill='none'/%3E%3Cpath d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z'/%3E%3C/svg%3E");
-  background-position: center center;
-  background-repeat: no-repeat;
-  height: 48px;
-  width: 48px;
-  ${baseStyles}
-`;
+//   return (
+//     <>
+//       {mapMenu().map(({ label, menuItems, menuId }, i) => {
+//         const hasMenuItems = menuItems !== undefined && menuItems.length > 0;
+
+//         if (!hasMenuItems)
+//           return (
+//             <MenuItem
+//               active={activeMenuItem === menuId}
+//               onClick={() => {
+//                 handleMenuItem(menuId);
+//               }}
+//             >
+//               {label}
+//             </MenuItem>
+//           );
+
+//         return (
+//           <Accordion heading={label} key={i}>
+//             {menuItems?.map(({ label, subItems, menuId }, i) => {
+//               const hasSubMenu = subItems !== undefined && subItems.length > 0;
+
+//               if (!hasSubMenu)
+//                 return (
+//                   <MenuItem
+//                     active={activeMenuItem === menuId}
+//                     onClick={() => {
+//                       handleMenuItem(menuId);
+//                     }}
+//                     className="level1"
+//                     key={i}
+//                   >
+//                     {label}
+//                   </MenuItem>
+//                 );
+
+//               return (
+//                 <Accordion className="sub" heading={label} key={i}>
+//                   {subItems?.map(({ label, menuId }, i) => {
+//                     return (
+//                       <MenuItem
+//                         active={activeMenuItem === menuId}
+//                         onClick={() => {
+//                           handleMenuItem(menuId);
+//                         }}
+//                         className="level2"
+//                         key={i}
+//                       >
+//                         {label}
+//                       </MenuItem>
+//                     );
+//                   })}
+//                 </Accordion>
+//               );
+//             })}
+//           </Accordion>
+//         );
+//       })}
+//     </>
+//   );
+// };
