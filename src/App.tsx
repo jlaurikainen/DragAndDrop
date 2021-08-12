@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Select from "./components/select/Select";
 
 interface User {
@@ -25,30 +25,40 @@ interface User {
   };
 }
 
-const App = () => {
-  const [value, setValue] = useState<readonly User[]>([]);
-  const [options, setOptions] = useState<User[]>([]);
+const debounce = <T extends unknown[], U>(
+  callback: (...args: T) => PromiseLike<U> | U,
+  wait: number
+) => {
+  let timer: number;
 
-  useEffect(() => {
-    const getOptions = async () => {
+  return (...args: T): Promise<U> => {
+    clearTimeout(timer);
+    return new Promise((resolve) => {
+      timer = window.setTimeout(() => resolve(callback(...args)), wait);
+    });
+  };
+};
+
+const App = () => {
+  const handleOptions = debounce(
+    async (_: string, callback: (options: User[]) => void) => {
       const res = await fetch("https://jsonplaceholder.typicode.com/users");
       const data = await res.json();
-      setOptions(data);
-    };
-    getOptions();
-  }, []);
+
+      return callback(data);
+    },
+    500
+  );
 
   return (
     <>
       <Select<User, true>
-        onChange={(v) => setValue(v)}
-        options={options}
-        isMulti
-        hideSelectedOptions={false}
         closeMenuOnSelect={false}
-        value={value}
         getOptionLabel={(o) => o.name}
         getOptionValue={(o) => `${o.id}`}
+        hideSelectedOptions={false}
+        isMulti
+        loadOptions={handleOptions}
       />
     </>
   );
