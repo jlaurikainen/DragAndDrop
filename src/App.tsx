@@ -1,70 +1,125 @@
-import React from "react";
-import Select from "./components/select/Select";
+import React, { useState } from "react";
+import Calendar from "./components/calendar/Calendar";
 
-interface User {
-  id: number;
-  name: string;
-  username: string;
-  email: string;
-  address: {
-    street: string;
-    suite: string;
-    city: string;
-    zipcode: string;
-    geo: {
-      lat: number;
-      lng: number;
-    };
-  };
-  phone: string;
-  website: string;
-  company: {
-    name: string;
-    catchPhrase: string;
-    bs: string;
-  };
-}
+// interface User {
+//   id: number;
+//   name: string;
+//   username: string;
+//   email: string;
+//   address: {
+//     street: string;
+//     suite: string;
+//     city: string;
+//     zipcode: string;
+//     geo: {
+//       lat: number;
+//       lng: number;
+//     };
+//   };
+//   phone: string;
+//   website: string;
+//   company: {
+//     name: string;
+//     catchPhrase: string;
+//     bs: string;
+//   };
+// }
 
-const debounce = <T extends unknown[], U>(
-  callback: (...args: T) => PromiseLike<U> | U,
-  wait: number
-) => {
-  let timer: number;
+// const debounce = <T extends unknown[], U>(
+//   callback: (...args: T) => PromiseLike<U> | U,
+//   wait: number
+// ) => {
+//   let timer: number;
 
-  return (...args: T): Promise<U> => {
-    clearTimeout(timer);
-    return new Promise((resolve) => {
-      timer = window.setTimeout(() => resolve(callback(...args)), wait);
-    });
-  };
-};
+//   return (...args: T): Promise<U> => {
+//     clearTimeout(timer);
+//     return new Promise((resolve) => {
+//       timer = window.setTimeout(() => resolve(callback(...args)), wait);
+//     });
+//   };
+// };
 
 const App = () => {
-  const handleOptions = debounce(
-    async (_: string, callback: (options: User[]) => void) => {
-      const res = await fetch("https://jsonplaceholder.typicode.com/users");
-      const data = await res.json();
+  // const [options] = useState([
+  //   {
+  //     label: "Group 1",
+  //     options: [
+  //       { label: "One", value: "1" },
+  //       { label: "Two", value: "2" },
+  //       { label: "Four", value: "3" },
+  //       { label: "Five", value: "4" },
+  //       { label: "Six", value: "5" },
+  //       { label: "Seven", value: "6" },
+  //     ],
+  //   },
+  //   {
+  //     label: "Group 2",
+  //     options: [
+  //       { label: "Eight", value: "7" },
+  //       { label: "Nine", value: "8" },
+  //       { label: "Ten", value: "9" },
+  //       { label: "Eleven", value: "10" },
+  //       { label: "Twelve", value: "11" },
+  //       { label: "Thirteen", value: "12" },
+  //     ],
+  //   },
+  // ]);
 
-      return callback(data);
-    },
-    500
-  );
+  const [value, setValue] = useState(new Date());
 
   return (
     <>
-      <Select<User, true>
-        closeMenuOnSelect={false}
-        getOptionLabel={(o) => o.name}
-        getOptionValue={(o) => `${o.id}`}
-        hideSelectedOptions={false}
-        isMulti
-        loadOptions={handleOptions}
-      />
+      {/* <TabNavigation activeItem={1}>
+        <TabItem tabId={1}>Item 1</TabItem>
+        <TabItem tabId={2}>Item 2</TabItem>
+        <TabItem tabId={3}>Item 3</TabItem>
+      </TabNavigation> */}
+      {/* <Grid>
+        <Item colSpan={4} rowSpan={2}>
+          <input type="text" style={{ boxSizing: "border-box", width: "100%" }} />
+        </Item>
+        <Item colSpan={4}>
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Laudantium reiciendis ipsam quis ipsa quod.
+          Necessitatibus est expedita aut, exercitationem, veniam tempore voluptatibus odio nobis asperiores quasi rerum
+          optio soluta voluptate. Eaque labore enim consequatur quam architecto pariatur beatae dolores maxime mollitia
+          ab ut porro minus ad velit fugit praesentium, perspiciatis hic vitae libero officia. Officia in labore
+          incidunt maxime dolorem. Sapiente temporibus officia nobis vitae tempora, molestiae nisi error corrupti
+          asperiores fugit.
+        </Item>
+        <Item colSpan={4}>Poop</Item>
+        <Item colSpan={12}>Poop</Item>
+        <Item>Poop</Item>
+        <Item colSpan={6}>Poop</Item>
+      </Grid> */}
+      <Calendar value={value} onChange={(v) => setValue(v)} />
+      {/* <FourOFour error="Oh shit! 404" description="Something went fucky-wucky" link="someurl" /> */}
+      {/* <Select<OptionTypeBase, true> options={options} isMulti hideSelectedOptions={false} closeMenuOnSelect={false} /> */}
     </>
   );
 };
 
 export default App;
+
+// const Grid = styled.div`
+//   display: grid;
+//   grid-template-columns: repeat(12, 1fr);
+//   grid-auto-rows: auto;
+//   gap: 16px;
+// `;
+
+// const Item = styled.div<{ colSpan?: number; rowSpan?: number }>`
+//   ${({ colSpan }) =>
+//     colSpan &&
+//     css`
+//       grid-column: span ${colSpan};
+//     `};
+
+//   ${({ rowSpan }) =>
+//     rowSpan &&
+//     css`
+//       grid-row: span ${rowSpan};
+//     `}
+// `;
 
 // type IMenu = { label: string; menuItems?: IMenuItem[] }[];
 

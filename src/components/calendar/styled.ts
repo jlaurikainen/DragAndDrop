@@ -6,11 +6,6 @@ export const CalendarWrapper = styled.div`
   grid-template-rows: auto auto auto;
   padding: 16px;
   box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
-
-  :focus {
-    outline: none;
-    box-shadow: inset 0 0 0 1px lightblue;
-  }
 `;
 
 export const Tile = styled.div`
@@ -49,7 +44,7 @@ export const Control = styled(Tile)`
   font-weight: bold;
   user-select: none;
 
-  :hover:not(.empty) > ${TileMarker} {
+  :hover > ${TileMarker} {
     background-color: lightgray;
   }
 `;
@@ -92,7 +87,6 @@ export const Day = styled(Tile)`
   background-color: transparent;
   font-weight: bold;
 
-
   :focus {
     outline: none;
   }
@@ -110,7 +104,7 @@ export const Day = styled(Tile)`
     box-shadow: inset 0 0 0 2px lightblue;
   }
 
-  :hover:not(.empty) > ${TileMarker} {
+  :hover > ${TileMarker} {
     background-color: lightgray;
   }
 `;

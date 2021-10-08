@@ -1,6 +1,5 @@
 import {
   addMonths,
-  getDate,
   getDay,
   getDaysInMonth,
   getISOWeeksInYear,
@@ -8,10 +7,10 @@ import {
   getWeek,
   getYear,
   startOfMonth,
-  subDays,
 } from "date-fns";
-import { addDays, startOfDay, subMonths } from "date-fns/esm";
+import { startOfDay, subMonths } from "date-fns/esm";
 import React, { useState } from "react";
+import { handleCalendarKeyEvents } from "./handleCalendarKeyEvents";
 import Controls from "./Controls";
 import MonthView from "./MonthView";
 import { CalendarWrapper } from "./styled";
@@ -25,7 +24,10 @@ interface ICalendar {
 }
 
 const Calendar = ({ onChange, value }: ICalendar) => {
-  const [navigationDate, setNavigationDate] = useState(startOfDay(new Date()));
+  const [navigationDate, setNavigationDate] = useState(
+    (value && startOfDay(value)) || startOfDay(new Date())
+  );
+
   const firstWeekOfMonth = getWeek(
     new Date(getYear(navigationDate), getMonth(navigationDate), 1),
     {
@@ -34,58 +36,17 @@ const Calendar = ({ onChange, value }: ICalendar) => {
     }
   );
 
-  const gotToPrevMonth = () => {
-    setNavigationDate(subMonths(navigationDate, 1));
-  };
-
-  const goToNextMonth = () => {
-    setNavigationDate(addMonths(navigationDate, 1));
-  };
-
-  const handleKeyEvents = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    const key = event.key;
-
-    switch (key) {
-      case "ArrowUp":
-        event.preventDefault();
-        setNavigationDate(subDays(navigationDate, 7));
-        break;
-      case "ArrowDown":
-        event.preventDefault();
-        setNavigationDate(addDays(navigationDate, 7));
-        break;
-      case "ArrowLeft":
-        event.preventDefault();
-        setNavigationDate(subDays(navigationDate, 1));
-        break;
-      case "ArrowRight":
-        event.preventDefault();
-        setNavigationDate(addDays(navigationDate, 1));
-        break;
-      case "Enter":
-        event.preventDefault();
-        onChange?.(navigationDate);
-        break;
-      case "PageUp":
-        event.preventDefault();
-        setNavigationDate(subMonths(navigationDate, 1));
-        break;
-      case "PageDown":
-        event.preventDefault();
-        setNavigationDate(addMonths(navigationDate, 1));
-    }
-  };
-
   return (
     <CalendarWrapper
-      onBlur={() => value && setNavigationDate(value)}
-      onKeyDown={handleKeyEvents}
+      onKeyDown={(e) =>
+        handleCalendarKeyEvents(e, navigationDate, setNavigationDate, onChange)
+      }
       tabIndex={0}
     >
       <Controls
         month={getMonthString(navigationDate)}
-        next={goToNextMonth}
-        prev={gotToPrevMonth}
+        next={() => setNavigationDate(addMonths(navigationDate, 1))}
+        prev={() => setNavigationDate(subMonths(navigationDate, 1))}
         year={getYear(navigationDate)}
       />
       <Weeks
@@ -94,14 +55,14 @@ const Calendar = ({ onChange, value }: ICalendar) => {
       />
       <Weekdays />
       <MonthView
-        day={getDate(navigationDate)}
         dayCount={getDaysInMonth(navigationDate)}
         firstDayOfMonth={getDay(startOfMonth(navigationDate))}
-        navigationSetter={setNavigationDate}
-        month={getMonth(navigationDate)}
+        navigationDate={navigationDate}
+        setNavigationDate={setNavigationDate}
+        navMonth={navigationDate.getMonth()}
+        navYear={navigationDate.getFullYear()}
         onChange={onChange}
         value={value}
-        year={getYear(navigationDate)}
       />
     </CalendarWrapper>
   );

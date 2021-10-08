@@ -1,131 +1,107 @@
-import { getDate, isValid, startOfDay } from "date-fns";
+import { getDate, startOfDay } from "date-fns";
 import { lastDayOfMonth } from "date-fns/esm";
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useMemo } from "react";
+import Day, { DayProps } from "./Day";
 import { MonthViewWrapper } from "./styled";
 import { daysInFront } from "./utils";
 
-interface DayProps {
-  value: string;
-  isSelected: boolean;
-  isOutside: boolean;
-  event: () => void;
-}
-
 interface Props {
-  day: number;
   dayCount: number;
   firstDayOfMonth: number;
-  navigationSetter: React.Dispatch<React.SetStateAction<Date>>;
-  month: number;
+  navigationDate: Date;
+  navMonth: number;
+  navYear: number;
   onChange?: (date: Date) => void;
+  setNavigationDate: React.Dispatch<React.SetStateAction<Date>>;
   value?: Date;
-  year: number;
 }
 
 const MonthView = ({
-  day,
   dayCount,
   firstDayOfMonth,
-  navigationSetter,
-  month,
-  value,
   onChange,
-  year,
+  navigationDate,
+  setNavigationDate,
+  navMonth,
+  navYear,
+  value,
 }: Props) => {
-  const monthView = useRef<HTMLDivElement>(null);
-
-  const resetHighlight = (date: Date) => {
-    navigationSetter(date);
-  };
+  const onDayClick = useCallback(
+    (date: Date) => {
+      setNavigationDate(date);
+      onChange?.(date);
+    },
+    [setNavigationDate, onChange]
+  );
 
   const daysToRender = useMemo(() => {
-    const prevMonthLastDay = getDate(lastDayOfMonth(new Date(year, month, 1)));
+    const prevMonthLastDay =
+      getDate(lastDayOfMonth(new Date(navYear, navMonth - 1, 1))) + 1;
     const emptyDays = daysInFront(firstDayOfMonth);
     let prevMonthDays = emptyDays;
     let nextMonthDays = 1;
 
-    return new Array(42).fill(null).map((_, i) => {
+    return new Array(42).fill(null).map((_, i): DayProps => {
       if (i < emptyDays) {
-        const prevMonthDayValue = new Date(year, month - 1, prevMonthDays);
+        const prevMonthDayValue = new Date(
+          navYear,
+          navMonth - 1,
+          prevMonthLastDay - prevMonthDays--
+        );
 
         return {
-          className: "outside",
-          element: "button",
+          as: "div",
+          isOutside: true,
           event: () => {
-            onChange?.(prevMonthDayValue);
-            resetHighlight(prevMonthDayValue);
+            onDayClick(prevMonthDayValue);
           },
-          value: `${prevMonthLastDay - prevMonthDays--}`,
+          value: `${prevMonthDayValue.getDate()}`,
         };
       }
 
       if (i >= emptyDays + dayCount) {
-        const nextMonthDayValue = new Date(year, month + 1, nextMonthDays);
+        const nextMonthDayValue = new Date(
+          navYear,
+          navMonth + 1,
+          nextMonthDays
+        );
 
         return {
-          className: "outside",
-          element: "button",
+          as: "div",
+          isOutside: true,
           event: () => {
-            onChange?.(nextMonthDayValue);
-            resetHighlight(nextMonthDayValue);
+            onDayClick(nextMonthDayValue);
           },
           value: `${nextMonthDays++}`,
         };
       }
 
-      const currentDayValue = new Date(year, month, i + 1 - emptyDays);
+      const currentDayValue = new Date(navYear, navMonth, i + 1 - emptyDays);
 
       return {
-        element: "button",
+        as: "button",
+        isHighlighted:
+          startOfDay(currentDayValue).getTime() ===
+          startOfDay(navigationDate).getTime(),
+        isSelected:
+          value &&
+          startOfDay(currentDayValue).getTime() === startOfDay(value).getTime(),
         event: () => {
-          onChange?.(currentDayValue);
-          resetHighlight(currentDayValue);
+          onDayClick(currentDayValue);
         },
         value: `${i + 1 - emptyDays}`,
       };
     });
     // eslint-disable-next-line
-  }, [dayCount, firstDayOfMonth, month, year]);
+  }, [dayCount, firstDayOfMonth, navigationDate, value]);
 
-  useEffect(() => {
-    if (monthView.current && value && isValid(value)) {
-      const monthViewDays = Array.from(monthView.current.children);
-
-      monthViewDays.forEach((day) => {
-        if (day.textContent) {
-          const compareDate = new Date(year, month, +day.textContent).getTime();
-
-          if (compareDate !== startOfDay(value).getTime()) {
-            day.classList.remove("selected");
-          } else {
-            day.classList.add("selected");
-          }
-        }
-      });
-    }
-  }, [value, month, year]);
-
-  useEffect(() => {
-    if (monthView.current) {
-      const dayWithActiveNavigation = day.toString();
-      const monthViewDays = Array.from(monthView.current.children);
-
-      monthViewDays.forEach((day) => {
-        if (day.textContent) {
-          if (
-            day.textContent !== dayWithActiveNavigation ||
-            day.classList.contains("outside")
-          ) {
-            day.classList.remove("highlighted");
-          } else {
-            day.classList.add("highlighted");
-          }
-        }
-      });
-    }
-  }, [day, month, year]);
-
-  return <MonthViewWrapper ref={monthView}></MonthViewWrapper>;
+  return (
+    <MonthViewWrapper>
+      {daysToRender.map((day, i) => (
+        <Day key={i} {...day} />
+      ))}
+    </MonthViewWrapper>
+  );
 };
 
 export default MonthView;

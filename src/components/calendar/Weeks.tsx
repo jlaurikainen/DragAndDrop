@@ -7,7 +7,7 @@ interface Props {
 }
 
 const Weeks = ({ firstWeekOfMonth, weeksInYear }: Props) => {
-  const getWeeks = () => {
+  const weekNumbers = () => {
     let weeksFromYearStart = 1;
 
     return new Array(6).fill(null).map((_, i) => {
@@ -21,7 +21,7 @@ const Weeks = ({ firstWeekOfMonth, weeksInYear }: Props) => {
 
   return (
     <WeeksWrapper>
-      {getWeeks().map((week, i) => (
+      {weekNumbers().map((week, i) => (
         <Week key={i}>{week}</Week>
       ))}
     </WeeksWrapper>
