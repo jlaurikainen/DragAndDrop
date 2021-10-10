@@ -8,8 +8,8 @@ import CalendarProvider from "./context/CalendarProvider";
 
 interface ICalendar {
   locale?: string;
-  onChange?: (date: Date) => void;
-  value?: Date;
+  onChange?: (date: Date | Date[]) => void;
+  value?: Date | Date[];
 }
 
 const Calendar = ({ locale = "fi", onChange, value }: ICalendar) => {

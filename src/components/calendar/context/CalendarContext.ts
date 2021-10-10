@@ -7,7 +7,7 @@ interface CalendarContextProps {
   navigationYear: number;
   onChange?: (date: Date) => void;
   setNavigationDate: Dispatch<SetStateAction<Date>>;
-  value?: Date;
+  value?: Date | Date[];
 }
 
 const CalendarContext = createContext<CalendarContextProps>(

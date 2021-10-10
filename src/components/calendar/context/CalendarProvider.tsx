@@ -5,7 +5,7 @@ import CalendarContext from "./CalendarContext";
 interface CalendarProviderProps {
   locale: string;
   onChange?: (date: Date) => void;
-  value?: Date;
+  value?: Date | Date[];
 }
 
 const CalendarProvider: FC<CalendarProviderProps> = ({
@@ -15,7 +15,7 @@ const CalendarProvider: FC<CalendarProviderProps> = ({
   value,
 }) => {
   const [navigationDate, setNavigationDate] = useState(
-    startOfDay(value ?? new Date())
+    startOfDay((value && Array.isArray(value) ? value[0] : value) ?? new Date())
   );
 
   const month = navigationDate.getMonth();

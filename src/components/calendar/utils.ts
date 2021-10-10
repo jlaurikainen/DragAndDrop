@@ -1,9 +1,23 @@
-import { getDay, isEqual, setDay, startOfDay, startOfWeek } from "date-fns";
+import {
+  getDay,
+  isEqual,
+  isWithinInterval,
+  setDay,
+  startOfDay,
+  startOfWeek,
+} from "date-fns";
 
 const formatter = (locale = "fi", options: Intl.DateTimeFormatOptions) =>
   new Intl.DateTimeFormat(locale, options);
 
-export const daysEqual = (a: Date, b: Date) => {
+export const daysEqual = (a: Date, b: Date | Date[]) => {
+  if (Array.isArray(b)) {
+    if (b.length === 2) {
+      return isWithinInterval(a, { start: b[0], end: b[1] });
+    }
+    return isEqual(startOfDay(a), startOfDay(b[0]));
+  }
+
   return isEqual(startOfDay(a), startOfDay(b));
 };
 
