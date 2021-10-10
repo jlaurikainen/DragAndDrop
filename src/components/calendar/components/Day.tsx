@@ -1,26 +1,24 @@
 import React, { Fragment } from "react";
-import { Day as StyledDay, TileMarker } from "./styled";
+import { Day as StyledDay, TileMarker } from "../styled";
 
 export interface DayProps {
-  as: "button" | "div";
   isHighlighted?: boolean;
   isSelected?: boolean;
   isOutside?: boolean;
-  event: () => void;
-  value: string;
+  onTileClick: () => void;
+  tileValue: string;
 }
 
 const Day: React.FC<DayProps> = ({
-  as,
   isHighlighted,
   isSelected,
   isOutside,
-  event,
-  value,
+  onTileClick: event,
+  tileValue: value,
 }) => {
   return (
     <StyledDay
-      as={as}
+      as="button"
       className={`${isSelected ? "selected" : ""}${
         isOutside ? " outside" : ""
       }${isHighlighted ? " highlighted" : ""}`}

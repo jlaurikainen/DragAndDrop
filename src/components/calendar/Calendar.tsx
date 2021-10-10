@@ -1,70 +1,27 @@
-import {
-  addMonths,
-  getDay,
-  getDaysInMonth,
-  getISOWeeksInYear,
-  getMonth,
-  getWeek,
-  getYear,
-  startOfMonth,
-} from "date-fns";
-import { startOfDay, subMonths } from "date-fns/esm";
-import React, { useState } from "react";
-import { handleCalendarKeyEvents } from "./handleCalendarKeyEvents";
-import Controls from "./Controls";
-import MonthView from "./MonthView";
-import { CalendarWrapper } from "./styled";
-import { getMonthString } from "./utils";
-import Weekdays from "./Weekdays";
-import Weeks from "./Weeks";
+import React from "react";
+import CalendarMenu from "./components/CalendarMenu";
+import Controls from "./components/Controls";
+import MonthView from "./components/MonthView";
+import Weekdays from "./components/Weekdays";
+import Weeks from "./components/Weeks";
+import CalendarProvider from "./context/CalendarProvider";
 
 interface ICalendar {
-  value?: Date;
+  locale?: string;
   onChange?: (date: Date) => void;
+  value?: Date;
 }
 
-const Calendar = ({ onChange, value }: ICalendar) => {
-  const [navigationDate, setNavigationDate] = useState(
-    (value && startOfDay(value)) || startOfDay(new Date())
-  );
-
-  const firstWeekOfMonth = getWeek(
-    new Date(getYear(navigationDate), getMonth(navigationDate), 1),
-    {
-      locale: { code: "fi-FI" },
-      firstWeekContainsDate: 7,
-    }
-  );
-
+const Calendar = ({ locale = "fi", onChange, value }: ICalendar) => {
   return (
-    <CalendarWrapper
-      onKeyDown={(e) =>
-        handleCalendarKeyEvents(e, navigationDate, setNavigationDate, onChange)
-      }
-      tabIndex={0}
-    >
-      <Controls
-        month={getMonthString(navigationDate)}
-        next={() => setNavigationDate(addMonths(navigationDate, 1))}
-        prev={() => setNavigationDate(subMonths(navigationDate, 1))}
-        year={getYear(navigationDate)}
-      />
-      <Weeks
-        firstWeekOfMonth={firstWeekOfMonth}
-        weeksInYear={getISOWeeksInYear(navigationDate)}
-      />
-      <Weekdays />
-      <MonthView
-        dayCount={getDaysInMonth(navigationDate)}
-        firstDayOfMonth={getDay(startOfMonth(navigationDate))}
-        navigationDate={navigationDate}
-        setNavigationDate={setNavigationDate}
-        navMonth={navigationDate.getMonth()}
-        navYear={navigationDate.getFullYear()}
-        onChange={onChange}
-        value={value}
-      />
-    </CalendarWrapper>
+    <CalendarProvider locale={locale} onChange={onChange} value={value}>
+      <CalendarMenu>
+        <Controls />
+        <Weeks />
+        <Weekdays />
+        <MonthView />
+      </CalendarMenu>
+    </CalendarProvider>
   );
 };
 

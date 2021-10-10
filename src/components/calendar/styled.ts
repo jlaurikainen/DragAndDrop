@@ -57,6 +57,7 @@ export const WeekdaysWrapper = styled.div`
 
 export const Weekday = styled(Tile)`
   color: #666;
+  text-transform: capitalize;
 `;
 
 export const WeeksWrapper = styled.div`
