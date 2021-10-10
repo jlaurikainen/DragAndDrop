@@ -10,15 +10,28 @@ import {
 const formatter = (locale = "fi", options: Intl.DateTimeFormatOptions) =>
   new Intl.DateTimeFormat(locale, options);
 
-export const daysEqual = (a: Date, b: Date | Date[]) => {
-  if (Array.isArray(b)) {
-    if (b.length === 2) {
-      return isWithinInterval(a, { start: b[0], end: b[1] });
-    }
-    return isEqual(startOfDay(a), startOfDay(b[0]));
+export const classNames = (classes: [boolean | undefined, string][]) => {
+  return classes
+    .filter(([isActive]) => isActive)
+    .map(([_, name]) => name)
+    .join(" ");
+};
+
+export const dayInValue = ({
+  dateToCompare,
+  value,
+}: {
+  dateToCompare: Date;
+  value: Date | Date[];
+}) => {
+  if (Array.isArray(value)) {
+    return isWithinInterval(dateToCompare, {
+      start: value[0],
+      end: value[value.length - 1],
+    });
   }
 
-  return isEqual(startOfDay(a), startOfDay(b));
+  return isEqual(startOfDay(dateToCompare), startOfDay(value));
 };
 
 export const daysInFront = (date: Date) => {

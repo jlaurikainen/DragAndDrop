@@ -1,5 +1,6 @@
 import React, { Fragment } from "react";
 import { Day as StyledDay, TileMarker } from "../styled";
+import { classNames } from "../utils";
 
 export interface DayProps {
   isHighlighted?: boolean;
@@ -19,9 +20,11 @@ const Day: React.FC<DayProps> = ({
   return (
     <StyledDay
       as="button"
-      className={`${isSelected ? "selected" : ""}${
-        isOutside ? " outside" : ""
-      }${isHighlighted ? " highlighted" : ""}`}
+      className={classNames([
+        [isHighlighted, "highlighted"],
+        [isSelected, "selected"],
+        [isOutside, "outside"],
+      ])}
       onClick={event}
       tabIndex={-1}
     >

@@ -2,7 +2,7 @@ import { addMonths, getDate, getDaysInMonth, lastDayOfMonth } from "date-fns";
 import { useContext, useMemo } from "react";
 import { DayProps } from "../components/Day";
 import CalendarContext from "../context/CalendarContext";
-import { daysEqual, daysInFront } from "../utils";
+import { dayInValue, daysInFront } from "../utils";
 
 const usePrepareDays = () => {
   const {
@@ -50,8 +50,8 @@ const usePrepareDays = () => {
     );
 
     return {
-      isHighlighted: daysEqual(date, navigationDate),
-      isSelected: value && daysEqual(date, value),
+      isHighlighted: dayInValue({ dateToCompare: date, value: navigationDate }),
+      isSelected: value && dayInValue({ dateToCompare: date, value }),
       isOutside: isPrev || isNext,
       onTileClick: () => {
         setNavigationDate(date);
