@@ -25,9 +25,11 @@ export const dayInValue = ({
   value: Date | Date[];
 }) => {
   if (Array.isArray(value)) {
+    const sortedDates = value.sort((a, b) => (a > b ? 1 : -1));
+
     return isWithinInterval(dateToCompare, {
-      start: value[0],
-      end: value[value.length - 1],
+      start: sortedDates[0],
+      end: sortedDates[value.length - 1],
     });
   }
 

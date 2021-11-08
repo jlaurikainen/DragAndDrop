@@ -7,9 +7,7 @@ export const useKeyboardNavigation = () => {
     useContext(CalendarContext);
 
   const keyboardHadler = (event: KeyboardEvent<HTMLDivElement>) => {
-    const key = event.key;
-
-    switch (key) {
+    switch (event.key) {
       case "ArrowDown":
         event.preventDefault();
         setNavigationDate(addDays(navigationDate, 7));

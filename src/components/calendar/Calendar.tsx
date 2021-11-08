@@ -6,15 +6,26 @@ import Weekdays from "./components/Weekdays";
 import Weeks from "./components/Weeks";
 import CalendarProvider from "./context/CalendarProvider";
 
-interface ICalendar {
+interface ICalendar<ValueType extends Date | Date[]> {
   locale?: string;
-  onChange?: (date: Date | Date[]) => void;
-  value?: Date | Date[];
+  onChange?: (date: ValueType) => void;
+  selectRange?: boolean;
+  value?: ValueType;
 }
 
-const Calendar = ({ locale = "fi", onChange, value }: ICalendar) => {
+const Calendar = <ValueType extends Date | Date[]>({
+  locale = "fi",
+  onChange,
+  selectRange,
+  value,
+}: ICalendar<ValueType>) => {
   return (
-    <CalendarProvider locale={locale} onChange={onChange} value={value}>
+    <CalendarProvider
+      locale={locale}
+      onChange={onChange}
+      selectRange={selectRange}
+      value={value}
+    >
       <CalendarMenu>
         <Controls />
         <Weeks />

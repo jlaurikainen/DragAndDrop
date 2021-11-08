@@ -10,6 +10,7 @@ const usePrepareDays = () => {
     navigationMonth,
     navigationYear,
     onChange,
+    selectRange,
     setNavigationDate,
     value,
   } = useContext(CalendarContext);
@@ -39,6 +40,20 @@ const usePrepareDays = () => {
     return navigationMonth;
   };
 
+  const handleTileClick = (date: Date) => {
+    if (selectRange) {
+      const newDates = value?.length === 2 ? [date] : [...value, date];
+
+      setNavigationDate(date);
+      onChange?.(newDates);
+
+      return;
+    }
+
+    setNavigationDate(date);
+    onChange?.(date);
+  };
+
   return new Array(42).fill(true).map((_, i): DayProps => {
     const isPrev = i < emptyDays;
     const isNext = i >= emptyDays + dayCount;
@@ -53,10 +68,7 @@ const usePrepareDays = () => {
       isHighlighted: dayInValue({ dateToCompare: date, value: navigationDate }),
       isSelected: value && dayInValue({ dateToCompare: date, value }),
       isOutside: isPrev || isNext,
-      onTileClick: () => {
-        setNavigationDate(date);
-        onChange?.(date);
-      },
+      onTileClick: () => handleTileClick(date),
       tileValue: isNext ? `${nextMonthDays++}` : `${date.getDate()}`,
     };
   });

@@ -1,19 +1,22 @@
 import { startOfDay } from "date-fns";
-import React, { FC, useState } from "react";
+import React, { ReactNode, useState } from "react";
 import CalendarContext from "./CalendarContext";
 
-interface CalendarProviderProps {
+interface CalendarProviderProps<T extends Date | Date[]> {
+  children: ReactNode;
   locale: string;
-  onChange?: (date: Date) => void;
-  value?: Date | Date[];
+  onChange?: (date: T) => void;
+  selectRange?: boolean;
+  value?: T;
 }
 
-const CalendarProvider: FC<CalendarProviderProps> = ({
+const CalendarProvider = <ValueType extends Date | Date[]>({
   children,
   locale,
   onChange,
+  selectRange,
   value,
-}) => {
+}: CalendarProviderProps<ValueType>) => {
   const [navigationDate, setNavigationDate] = useState(
     startOfDay((value && Array.isArray(value) ? value[0] : value) ?? new Date())
   );
@@ -28,6 +31,7 @@ const CalendarProvider: FC<CalendarProviderProps> = ({
         navigationDate,
         navigationMonth: month,
         navigationYear: year,
+        selectRange,
         setNavigationDate,
         onChange,
         value,
