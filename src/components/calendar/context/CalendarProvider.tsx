@@ -30,19 +30,11 @@ const CalendarProvider = <ValueType extends Date | Date[]>({
   );
 
   const handleChange = (date: ValueType) => {
-    if (onChange !== undefined) {
-      onChange(date);
-      return;
-    }
-    setInternalValue(date);
+    onChange?.(date) ?? setInternalValue(date);
   };
 
   const handleNavigation = (date: Date) => {
-    if (setNavigationValue !== undefined) {
-      setNavigationValue(date);
-      return;
-    }
-    setInternalNavigationValue(date);
+    setNavigationValue?.(date) ?? setInternalNavigationValue(date);
   };
 
   const month = (navigationValue ?? internalNavigationValue).getMonth();
