@@ -8,22 +8,28 @@ import CalendarProvider from "./context/CalendarProvider";
 
 interface ICalendar<ValueType extends Date | Date[]> {
   locale?: string;
+  navigationValue?: Date;
   onChange?: (date: ValueType) => void;
   selectRange?: boolean;
+  setNavigationValue?: (date: Date) => void;
   value?: ValueType;
 }
 
 const Calendar = <ValueType extends Date | Date[]>({
   locale = "fi",
+  navigationValue,
   onChange,
   selectRange,
+  setNavigationValue,
   value,
 }: ICalendar<ValueType>) => {
   return (
     <CalendarProvider
       locale={locale}
+      navigationValue={navigationValue}
       onChange={onChange}
       selectRange={selectRange}
+      setNavigationValue={setNavigationValue}
       value={value}
     >
       <CalendarMenu>

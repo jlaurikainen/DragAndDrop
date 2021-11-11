@@ -5,20 +5,24 @@ import { ControlsWrapper, Control, TileMarker, Month } from "../styled";
 import { getMonthString } from "../utils";
 
 const Controls = () => {
-  const { locale, navigationDate, navigationYear, setNavigationDate } =
+  const { locale, navigationValue, navigationYear, setNavigationValue } =
     useContext(CalendarContext);
 
   return (
     <ControlsWrapper>
-      <Control onClick={() => setNavigationDate(addMonths(navigationDate, -1))}>
+      <Control
+        onClick={() => setNavigationValue(addMonths(navigationValue, -1))}
+      >
         <TileMarker />
         {"<"}
       </Control>
       <Month>{`${getMonthString({
-        date: navigationDate,
+        date: navigationValue,
         locale,
       })} ${navigationYear}`}</Month>
-      <Control onClick={() => setNavigationDate(addMonths(navigationDate, 1))}>
+      <Control
+        onClick={() => setNavigationValue(addMonths(navigationValue, 1))}
+      >
         <TileMarker />
         {">"}
       </Control>

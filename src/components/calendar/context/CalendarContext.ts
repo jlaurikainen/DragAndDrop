@@ -1,14 +1,14 @@
-import { createContext, Dispatch, SetStateAction } from "react";
+import { createContext } from "react";
 
 interface CalendarContextProps<T extends Date | Date[] = any> {
   locale: string;
-  navigationDate: Date;
+  navigationValue: Date;
   navigationMonth: number;
   navigationYear: number;
-  onChange?: (date: T) => void;
+  onChange: (date: T) => void;
   selectRange?: boolean;
-  setNavigationDate: Dispatch<SetStateAction<Date>>;
-  value?: T;
+  setNavigationValue: (date: Date) => void;
+  value: T;
 }
 
 const CalendarContext = createContext<CalendarContextProps>(

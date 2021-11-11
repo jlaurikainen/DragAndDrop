@@ -6,12 +6,11 @@ import { dayInValue, daysInFront } from "../utils";
 
 const usePrepareDays = () => {
   const {
-    navigationDate,
+    navigationValue,
     navigationMonth,
     navigationYear,
     onChange,
     selectRange,
-    setNavigationDate,
     value,
   } = useContext(CalendarContext);
 
@@ -44,13 +43,11 @@ const usePrepareDays = () => {
     if (selectRange) {
       const newDates = value?.length === 2 ? [date] : [...value, date];
 
-      setNavigationDate(date);
       onChange?.(newDates);
 
       return;
     }
 
-    setNavigationDate(date);
     onChange?.(date);
   };
 
@@ -65,7 +62,10 @@ const usePrepareDays = () => {
     );
 
     return {
-      isHighlighted: dayInValue({ dateToCompare: date, value: navigationDate }),
+      isHighlighted: dayInValue({
+        dateToCompare: date,
+        value: navigationValue,
+      }),
       isSelected: value && dayInValue({ dateToCompare: date, value }),
       isOutside: isPrev || isNext,
       onTileClick: () => handleTileClick(date),

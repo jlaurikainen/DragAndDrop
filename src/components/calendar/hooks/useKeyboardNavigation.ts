@@ -2,39 +2,44 @@ import { addDays, addMonths } from "date-fns";
 import { KeyboardEvent, useContext } from "react";
 import CalendarContext from "../context/CalendarContext";
 
-export const useKeyboardNavigation = () => {
-  const { navigationDate, setNavigationDate, onChange } =
-    useContext(CalendarContext);
+export const useKeyboardNavigation = <T extends HTMLElement>(
+  setNavigationValue: (date: Date) => void
+) => {
+  const { navigationValue, onChange, value } = useContext(CalendarContext);
 
-  const keyboardHadler = (event: KeyboardEvent<HTMLDivElement>) => {
+  const keyboardHadler = (event: KeyboardEvent<T>) => {
     switch (event.key) {
       case "ArrowDown":
         event.preventDefault();
-        setNavigationDate(addDays(navigationDate, 7));
+        setNavigationValue(addDays(navigationValue, 7));
         break;
       case "ArrowLeft":
         event.preventDefault();
-        setNavigationDate(addDays(navigationDate, -1));
+        setNavigationValue(addDays(navigationValue, -1));
         break;
       case "ArrowRight":
         event.preventDefault();
-        setNavigationDate(addDays(navigationDate, 1));
+        setNavigationValue(addDays(navigationValue, 1));
         break;
       case "ArrowUp":
         event.preventDefault();
-        setNavigationDate(addDays(navigationDate, -7));
+        setNavigationValue(addDays(navigationValue, -7));
         break;
       case "Enter":
         event.preventDefault();
-        onChange?.(navigationDate);
+        onChange(navigationValue);
+        break;
+      case "Home":
+        event.preventDefault();
+        setNavigationValue(value ?? new Date());
         break;
       case "PageDown":
         event.preventDefault();
-        setNavigationDate(addMonths(navigationDate, 1));
+        setNavigationValue(addMonths(navigationValue, 1));
         break;
       case "PageUp":
         event.preventDefault();
-        setNavigationDate(addMonths(navigationDate, -1));
+        setNavigationValue(addMonths(navigationValue, -1));
         break;
     }
   };
